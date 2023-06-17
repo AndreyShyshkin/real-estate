@@ -1,6 +1,133 @@
 <?php
 get_header();
+
+if(isset($_GET['price_range']) && $_GET['price_range'] !== '') {
+    $priceRange = $_GET['price_range'];
+    $priceValues = explode(',', $priceRange);
+    $minPrice = intval($priceValues[0]);
+    $maxPrice = intval($priceValues[1]);
+}else {
+    $minPrice = 2000;
+    $maxPrice = 1000000;
+}
+
+if(isset($_GET['property_geo']) && $_GET['property_geo'] !== '') {
+    $areaRange = $_GET['property_geo'];
+    $areaValues = explode(',', $areaRange);
+    $minArea = intval($areaValues[0]);
+    $maxArea = intval($areaValues[1]);
+}else {
+    $minArea = 40;
+    $maxArea = 400;
+}
+
+if(isset($_GET['min_baths']) && $_GET['min_baths'] !== '') {
+    $minBaths = $_GET['min_baths'];
+    $bathsValues = explode(',', $minBaths);
+    $minBaths = intval($bathsValues[0]);
+    $maxBaths = intval($bathsValues[1]);
+}else {
+    $minBaths = 1;
+    $maxBaths = 50;
+}
+
+if(isset($_GET['min_bed']) && $_GET['min_bed'] !== '') {
+    $minBed = $_GET['min_bed'];
+    $bedValues = explode(',', $minBed);
+    $minBed = intval($bedValues[0]);
+    $maxBed = intval($bedValues[1]);
+}else {
+    $minBed = 1;
+    $maxBed = 50;
+}
+
+$selectedCategories = isset($_GET['categories']) ? $_GET['categories'] : array();
+
 ?>
+
+<script>
+    
+$(document).ready(function() {
+    let orderButton = $(".order_by_price");
+    let dateButton = $(".order_by_date");
+    let sortOrder = "DESC";
+
+    orderButton.on("click", function() {
+        let propertiesContainer = $("#ype");
+        let properties = propertiesContainer.find(".col-sm-6.col-md-4.p0");
+
+        sortOrder = (sortOrder === "DESC") ? "ASC" : "DESC";
+
+        properties.removeClass("sorted");
+
+        $("li").removeClass("active");
+
+        $(this).closest("li").addClass("active");
+
+        $(this).parent().parent().addClass("sorted");
+
+        properties.sort(function(a, b) {
+            let priceA = parseFloat($(a).find(".proerty-price").text().replace(/\D/g, ''));
+            let priceB = parseFloat($(b).find(".proerty-price").text().replace(/\D/g, ''));
+
+            if (sortOrder === "DESC") {
+                $(".order_by_price i").removeClass("fa-arrow-down-short-wide");
+                $(".order_by_price i").addClass("fa-arrow-down-wide-short");
+                return priceB - priceA;
+            } else {
+                $(".order_by_price i").addClass("fa-arrow-down-short-wide");
+                $(".order_by_price i").removeClass("fa-arrow-down-wide-short");
+                return priceA - priceB;
+            }
+        });
+
+        propertiesContainer.empty();
+
+
+        properties.each(function() {
+            propertiesContainer.append($(this));
+        });
+    });
+
+    dateButton.on("click", function() {
+        let propertiesContainer = $("#ype");
+        let properties = propertiesContainer.find(".col-sm-6.col-md-4.p0");
+
+        sortOrder = (sortOrder === "DESC") ? "ASC" : "DESC";
+
+        properties.removeClass("sorted");
+
+        $("li").removeClass("active");
+
+        $(this).closest("li").addClass("active");
+
+        $(this).parent().parent().addClass("sorted");
+
+        properties.sort(function(a, b) {
+            let dateA = parseFloat($(a).find(".date").text());
+            let dateB = parseFloat($(b).find(".date").text());
+
+            if (sortOrder === "DESC") {
+                $(".order_by_date i").removeClass("fa-arrow-down-short-wide");
+                $(".order_by_date i").addClass("fa-arrow-down-wide-short");
+                return dateB - dateA;
+            } else {
+                $(".order_by_date i").addClass("fa-arrow-down-short-wide");
+                $(".order_by_date i").removeClass("fa-arrow-down-wide-short");
+                return dateA - dateB;
+            }
+        });
+
+        propertiesContainer.empty();
+
+        properties.each(function() {
+            propertiesContainer.append($(this));
+        });
+    });
+        });
+        
+</script>
+
 <div class="page-head"> 
             <div class="container">
                 <div class="row">
@@ -28,7 +155,7 @@ get_header();
                                     <fieldset>
                                         <div class="row">
                                             <div class="col-xs-12">
-                                                <input type="text" class="form-control" placeholder="Key word">
+                                                <input type="text" name="keyword" class="form-control" placeholder="Key word">
                                             </div>
                                         </div>
                                     </fieldset>
@@ -37,23 +164,44 @@ get_header();
                                         <div class="row">
                                             <div class="col-xs-6">
 
-                                                <select id="lunchBegins" class="selectpicker" data-live-search="true" data-live-search-style="begins" title="Select Your City">
+                                                <select id="lunchBegins" name="cities" class="selectpicker" data-live-search="true" data-live-search-style="begins" title="Select Your City">
 
-                                                    <option>New york, CA</option>
-                                                    <option>Paris</option>
-                                                    <option>Casablanca</option>
-                                                    <option>Tokyo</option>
-                                                    <option>Marraekch</option>
-                                                    <option>kyoto , shibua</option>
+                                                <?php 
+                                                $taxonomies = get_post_taxonomies();
+
+                                                $taxonomy_name = 'cities';
+
+                                                $terms = get_terms($taxonomy_name);
+
+                                                if ($terms) {
+                                                    foreach ($terms as $term) {
+                                                        echo '<option';
+                                                        if (isset($_GET['cities']) && $_GET['cities'] === $term->name) {
+                                                        echo ' selected';
+                                                        }
+                                                        echo '>' . $term->name . '</option>';
+                                                    }								}
+                                                    else {
+                                                        echo '<option>Нет cities.</option>';
+                                                    }
+									            ?> 
+
                                                 </select>
                                             </div>
                                             <div class="col-xs-6">
 
-                                                <select id="basic" class="selectpicker show-tick form-control">
-                                                    <option> -Status- </option>
-                                                    <option>Rent </option>
-                                                    <option>Boy</option>
-                                                    <option>used</option>  
+                                            <select id="basic" name="status" class="selectpicker show-tick form-control" title="-Status-">
+                                                <?php 
+                                                if(isset($_GET['status']) && $_GET['status'] !== '') {
+                                                    $status = $_GET['status'];
+                                                    ?>
+                                                    <option <?php if($status == 'sell') {echo 'selected';} ?>>sell</option>
+                                                    <option <?php if($status == 'rent') {echo 'selected';} ?>>rent</option>
+                                                    <?php
+                                                }  
+                                                ?>
+                                                    <option>sell</option>
+                                                    <option>rent</option>  
 
                                                 </select>
                                             </div>
@@ -64,19 +212,19 @@ get_header();
                                         <div class="row">
                                             <div class="col-xs-6">
                                                 <label for="price-range">Price range ($):</label>
-                                                <input type="text" class="span2" value="" data-slider-min="0" 
-                                                       data-slider-max="600" data-slider-step="5" 
-                                                       data-slider-value="[0,450]" id="price-range" ><br />
-                                                <b class="pull-left color">2000$</b> 
-                                                <b class="pull-right color">100000$</b>                                                
+                                                <input type="text" class="span2" value="" data-slider-min="20000" 
+                                                       data-slider-max="1000000" data-slider-step="100" 
+                                                       data-slider-value="[<?php echo $minPrice ?>, <?php echo $maxPrice ?>]" id="price-range" name="price_range"><br />
+                                                <b class="pull-left color">20000$</b> 
+                                                <b class="pull-right color">1000000$</b>                                                
                                             </div>
                                             <div class="col-xs-6">
                                                 <label for="property-geo">Property geo (m2) :</label>
-                                                <input type="text" class="span2" value="" data-slider-min="0" 
-                                                       data-slider-max="600" data-slider-step="5" 
-                                                       data-slider-value="[50,450]" id="property-geo" ><br />
+                                                <input type="text" class="span2" value="" data-slider-min="40" 
+                                                       data-slider-max="400" data-slider-step="5" 
+                                                       data-slider-value="[<?php echo $minArea ?>, <?php echo $maxArea ?>]" id="property-geo" name="property_geo"><br />
                                                 <b class="pull-left color">40m</b> 
-                                                <b class="pull-right color">12000m</b>                                                
+                                                <b class="pull-right color">400m</b>                                                
                                             </div>                                            
                                         </div>
                                     </fieldset>                                
@@ -84,96 +232,57 @@ get_header();
                                     <fieldset class="padding-5">
                                         <div class="row">
                                             <div class="col-xs-6">
-                                                <label for="price-range">Min baths :</label>
-                                                <input type="text" class="span2" value="" data-slider-min="0" 
-                                                       data-slider-max="600" data-slider-step="5" 
-                                                       data-slider-value="[250,450]" id="min-baths" ><br />
+                                                <label for="price-range">Baths :</label>
+                                                <input type="text" class="span2" value="" data-slider-min="1" 
+                                                       data-slider-max="50" data-slider-step="1" 
+                                                       data-slider-value="[<?php echo $minBaths ?>, <?php echo $maxBaths ?>]" id="min-baths" name="min_baths"><br />
                                                 <b class="pull-left color">1</b> 
-                                                <b class="pull-right color">120</b>                                                
+                                                <b class="pull-right color">50</b>                                                
                                             </div>
 
                                             <div class="col-xs-6">
-                                                <label for="property-geo">Min bed :</label>
-                                                <input type="text" class="span2" value="" data-slider-min="0" 
-                                                       data-slider-max="600" data-slider-step="5" 
-                                                       data-slider-value="[250,450]" id="min-bed" ><br />
+                                                <label for="property-geo">Bed :</label>
+                                                <input type="text" class="span2" value="" data-slider-min="1" 
+                                                       data-slider-max="50" data-slider-step="1" 
+                                                       data-slider-value="[<?php echo $minBed ?>, <?php echo $maxBed ?>]" id="min-bed" name="min_bed"><br />
                                                 <b class="pull-left color">1</b> 
-                                                <b class="pull-right color">120</b>
+                                                <b class="pull-right color">50</b>
 
                                             </div>
                                         </div>
                                     </fieldset>
+                                    <?php
+                                    $taxonomy_name = 'features';
+                                    $terms = get_terms($taxonomy_name);
+                                    ?>
 
                                     <fieldset class="padding-5">
                                         <div class="row">
                                             <div class="col-xs-6">
                                                 <div class="checkbox">
-                                                    <label> <input type="checkbox" checked> Fire Place</label>
-                                                </div> 
+                                                    <?php
+                                                    $half_count = ceil(count($terms) / 2); 
+                                                    $counter = 0;
+                                                    foreach ($terms as $term) {
+                                                        $isChecked = in_array($term->slug, $selectedCategories) ? 'checked' : '';
+                                                        if ($counter == $half_count) {
+                                                            echo '</div></div><div class="col-xs-6"><div class="checkbox">';
+                                                        }
+                                                        ?>
+                                                        <label>
+                                                            <input type="checkbox" name="categories[]" value="<?php echo $term->slug; ?>"  <?php echo $isChecked; ?>>
+                                                            <?php echo $term->name; ?>
+                                                        </label>
+                                                        <?php
+                                                        $counter++;
+                                                    }
+                                                    ?>
+                                                </div>
                                             </div>
-
-                                            <div class="col-xs-6">
-                                                <div class="checkbox">
-                                                    <label> <input type="checkbox"> Dual Sinks</label>
-                                                </div>
-                                            </div>                                            
                                         </div>
                                     </fieldset>
 
-                                    <fieldset class="padding-5">
-                                        <div class="row">
-                                            <div class="col-xs-6"> 
-                                                <div class="checkbox">
-                                                    <label> <input type="checkbox" checked> Swimming Pool</label>
-                                                </div>
-                                            </div>  
-                                            <div class="col-xs-6"> 
-                                                <div class="checkbox">
-                                                    <label> <input type="checkbox" checked> 2 Stories </label>
-                                                </div>
-                                            </div>  
-                                        </div>
-                                    </fieldset>
 
-                                    <fieldset class="padding-5">
-                                        <div class="row">
-                                            <div class="col-xs-6"> 
-                                                <div class="checkbox">
-                                                    <label><input type="checkbox"> Laundry Room </label>
-                                                </div>
-                                            </div>  
-                                            <div class="col-xs-6"> 
-                                                <div class="checkbox">
-                                                    <label> <input type="checkbox"> Emergency Exit</label>
-                                                </div>
-                                            </div>  
-                                        </div>
-                                    </fieldset>
-
-                                    <fieldset class="padding-5">
-                                        <div class="row">
-                                            <div class="col-xs-6"> 
-                                                <div class="checkbox">
-                                                    <label>  <input type="checkbox" checked> Jog Path </label>
-                                                </div>
-                                            </div>  
-                                            <div class="col-xs-6"> 
-                                                <div class="checkbox">
-                                                    <label>  <input type="checkbox"> 26' Ceilings </label>
-                                                </div>
-                                            </div>  
-                                        </div>
-                                    </fieldset>
-
-                                    <fieldset class="padding-5">
-                                        <div class="row">
-                                            <div class="col-xs-12"> 
-                                                <div class="checkbox">
-                                                    <label>  <input type="checkbox"> Hurricane Shutters </label>
-                                                </div>
-                                            </div>  
-                                        </div>
-                                    </fieldset>
 
                                     <fieldset >
                                         <div class="row">
@@ -183,6 +292,13 @@ get_header();
                                         </div>
                                     </fieldset>                                     
                                 </form>
+                                <fieldset >
+                                        <div class="row">
+                                            <div class="col-xs-12">  
+                                                <a href="/properties/">Убрать фильтры</a>
+                                            </div>  
+                                        </div>
+                                </fieldset> 
                             </div>
                         </div>
 
@@ -254,35 +370,21 @@ get_header();
 
                 <div class="col-md-9  pr0 padding-top-40 properties-page">
                     <div class="col-md-12 clear"> 
-                        <div class="col-xs-10 page-subheader sorting pl0">
+                    <div class="col-xs-10 page-subheader sorting pl0">
                             <ul class="sort-by-list">
-                                <li class="active">
-                                    <a href="javascript:void(0);" class="order_by_date" data-orderby="property_date" data-order="ASC">
-                                        Property Date <i class="fa fa-sort-amount-asc"></i>					
-                                    </a>
-                                </li>
+                            <li class="">
+                                <a href="javascript:void(0);" class="order_by_date" data-orderby="property_date" data-order="DESC">
+                                    Property Date <i class="fa-solid fa-arrow-down-short-wide"></i>					
+                                </a>
+                            </li>
+
+
                                 <li class="">
-                                    <a href="javascript:void(0);" class="order_by_price" data-orderby="property_price" data-order="DESC">
-                                        Property Price <i class="fa fa-sort-numeric-desc"></i>						
-                                    </a>
+                                <a href="javascript:void(0);" class="order_by_price" data-orderby="property_price" data-order="DESC">
+                                    Property Price <i class="fa-solid fa-arrow-down-short-wide"></i>					
+                                </a>
                                 </li>
                             </ul><!--/ .sort-by-list-->
-
-                            <div class="items-per-page">
-                                <label for="items_per_page"><b>Property per page :</b></label>
-                                <div class="sel">
-                                    <select id="items_per_page" name="per_page">
-                                        <option value="3">3</option>
-                                        <option value="6">6</option>
-                                        <option value="9">9</option>
-                                        <option selected="selected" value="12">12</option>
-                                        <option value="15">15</option>
-                                        <option value="30">30</option>
-                                        <option value="45">45</option>
-                                        <option value="60">60</option>
-                                    </select>
-                                </div><!--/ .sel-->
-                            </div><!--/ .items-per-page-->
                         </div>
 
                         <div class="col-xs-2 layout-switcher">
@@ -293,9 +395,82 @@ get_header();
 
                     <div class="col-md-12 clear"> 
                         <div id="ype" class="proerty-th">
-                                <?php if ( have_posts() ) : 
-                                    while ( have_posts() ) :
-                                        the_post();
+                                <?php 
+                                
+                                $args = array(
+                                    'post_type' => 'property', 
+                                    'posts_per_page' => -1,
+                                    'meta_query' => array(
+                                        array(
+                                            'key' => 'price',
+                                            'value' => array($minPrice, $maxPrice),
+                                            'type' => 'numeric',
+                                            'compare' => 'BETWEEN',
+                                        ),
+                                        array(
+                                            'key' => 'area',
+                                            'value' => array($minArea, $maxArea),
+                                            'type' => 'numeric',
+                                            'compare' => 'BETWEEN',
+                                        ),
+                                        array(
+                                            'key' => 'bath_room',
+                                            'value' => array($minBaths, $maxBaths),
+                                            'type' => 'numeric',
+                                            'compare' => 'BETWEEN',
+                                        ),
+                                        array(
+                                            'key' => 'bed_room',
+                                            'value' => array($minBed, $maxBed),
+                                            'type' => 'numeric',
+                                            'compare' => 'BETWEEN',
+                                        ),
+                                    ), 
+                                );
+                                
+                                if(isset($_GET['status']) && $_GET['status'] !== '') {
+                                    $status = $_GET['status'];
+                                        $args['meta_query'][] = array(
+                                            array(
+                                                'key' => 'status',
+                                                'value' => $status,
+                                                'type' => 'text',
+                                                'compare' => '=',
+                                            ),
+                                        );
+                                } 
+
+                                if(isset($_GET['cities']) && $_GET['cities'] !== '') {
+                                    $cities = $_GET['cities'];
+                                        $args['tax_query'] = array(
+                                            array(
+                                                'taxonomy' => 'cities',
+                                                'field' => 'slug',
+                                                'terms' => $cities,
+                                            ),
+                                        );
+                                } 
+
+                                if ($selectedCategories != null || $selectedCategories == '') {
+                                    $args['tax_query'] = array(
+                                        array(
+                                            'taxonomy' => $taxonomy_name,
+                                            'field' => 'slug',
+                                            'terms' => $selectedCategories,
+                                        ),
+                                    );
+                                }
+
+                                if (isset($_GET['keyword']) && $_GET['keyword'] !== '') {
+                                    $keyword_term = $_GET['keyword'];
+                                    $args['s'] = $keyword_term;
+                                }
+
+                                $query = new WP_Query($args);
+                                    
+                                    if ( $query->have_posts() ) : 
+                                        while ( $query->have_posts() ) :
+                                        $query->the_post();
                                         $area = get_post_meta(get_the_ID(),'area',true);
                                         $price = get_post_meta(get_the_ID(),'price',true);
                                         $bed_room = get_post_meta(get_the_ID(),'bed_room',true);
@@ -325,16 +500,39 @@ get_header();
                                                 <img src="<?php echo get_template_directory_uri()?>/assets/img/icon/shawer.png"> (<?php echo $bath_room ?>)|
                                                 <img src="<?php echo get_template_directory_uri()?>/assets/img/icon/cars.png"> (<?php echo $garage ?>)  
                                             </div>
+                                            <p>Опубликовано: <span class="date"><?php echo get_the_date()?></span></p>
                                         </div>
+                                        <?php
+                                            $taxonomies = get_post_taxonomies(get_the_ID());
 
+                                            $taxonomy_name = 'features';
+
+                                            $terms = get_the_terms(get_the_ID(), $taxonomy_name);
+
+                                            if ($terms) {
+                                        
+            ?>                         
+                                            <ul>
+                                                <?php
+                                                foreach ($terms as $term) {
+                                                    echo '<li><a href="properties.html">' . $term->name . '</a></li>';
+                                                }								}
+                                                else {
+                                                    echo '<p>Нет features.</p>';
+                                                }
+                                                ?>
+                                            </ul>
 
                                     </div>
                                 </div> 
                                         <?php
 
-                                    endwhile;
+                                        endwhile;
+                                        else :
+                                            echo 'No posts found.';
+                                        endif;
 
-                                    the_posts_navigation();
+                                        wp_reset_postdata();
                                 ?>
                         </div>
                     </div>
@@ -354,13 +552,6 @@ get_header();
                         </div>                
                     </div>
                 </div>  
-                <?php 
-                else :
-
-                    get_template_part( 'template-parts/content', 'none' );
-
-                endif;
-                ?>
                 </div>              
             </div>
         </div>

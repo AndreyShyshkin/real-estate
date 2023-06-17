@@ -1,0 +1,17 @@
+#post-0{
+    width: 400px;
+    margin: 30px auto;
+}
+
+#post-0 input{
+    border: 1px solid black;
+}
+
+.tml-rememberme-wrap{
+    display: flex;
+}
+
+.icheckbox_square-yellow{
+    margin-top: 10px;
+    margin-right: 10px;
+}

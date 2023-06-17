@@ -22,30 +22,40 @@ get_header();
                         <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eligendi deserunt deleniti, ullam commodi sit ipsam laboriosam velit adipisci quibusdam aliquam teneturo!</p>
                         <div class="search-form wow pulse" data-wow-delay="0.8s">
 
-                            <form action="" class=" form-inline">
+                            <form action="properties/" class=" form-inline">
                                 <button class="btn  toggle-btn" type="button"><i class="fa fa-bars"></i></button>
 
                                 <div class="form-group">
-                                    <input type="text" class="form-control" placeholder="<?php _e('Key word', 'realestate')?>">
+                                    <input type="text" name="keyword" class="form-control" placeholder="<?php _e('Key word', 'realestate')?>">
                                 </div>
                                 <div class="form-group">                                   
-                                    <select id="lunchBegins" class="selectpicker" data-live-search="true" data-live-search-style="begins" title="<?php _e('Select your city', 'realestate')?>">
+                                    <select id="lunchBegins" name="cities" class="selectpicker" data-live-search="true" data-live-search-style="begins" title="<?php _e('Select your city', 'realestate')?>">
 
-                                        <option>New york, CA</option>
-                                        <option>Paris</option>
-                                        <option>Casablanca</option>
-                                        <option>Tokyo</option>
-                                        <option>Marraekch</option>
-                                        <option>kyoto , shibua</option>
+                                                <?php 
+                                                $taxonomies = get_post_taxonomies();
+
+                                                $taxonomy_name = 'cities';
+
+                                                $terms = get_terms($taxonomy_name);
+
+                                                if ($terms) {
+                                                    foreach ($terms as $term) {
+                                                        echo '<option';
+                                                        if (isset($_GET['cities']) && $_GET['cities'] === $term->name) {
+                                                        echo ' selected';
+                                                        }
+                                                        echo '>' . $term->name . '</option>';
+                                                    }								}
+                                                    else {
+                                                        echo '<option>Нет cities.</option>';
+                                                    }
+									            ?>
                                     </select>
                                 </div>
                                 <div class="form-group">                                     
-                                    <select id="basic" class="selectpicker show-tick form-control">
-                                        <option><?php _e('-Status-', 'realestate')?></option>
-                                        <option>Rent </option>
-                                        <option>Boy</option>
-                                        <option>used</option>  
-
+                                    <select id="basic" name="status" class="selectpicker show-tick form-control" title="-Status-">
+                                                    <option>sell</option>
+                                                    <option>rent</option>  
                                     </select>
                                 </div>
                                 <button class="btn search-btn" type="submit"><i class="fa fa-search"></i></button>
@@ -56,21 +66,21 @@ get_header();
 
                                         <div class="form-group mar-r-20">
                                             <label for="price-range">Price range ($):</label>
-                                            <input type="text" class="span2" value="" data-slider-min="0" 
-                                                   data-slider-max="600" data-slider-step="5" 
-                                                   data-slider-value="[0,450]" id="price-range" ><br />
-                                            <b class="pull-left color">2000$</b> 
-                                            <b class="pull-right color">100000$</b>
+                                            <input type="text" class="span2" value="" data-slider-min="20000" 
+                                                   data-slider-max="1000000" data-slider-step="100" 
+                                                   data-slider-value="[20000,1000000]" id="price-range" name="price_range"><br />
+                                            <b class="pull-left color">20000$</b> 
+                                            <b class="pull-right color">1000000$</b>
                                         </div>
                                         <!-- End of  -->  
 
                                         <div class="form-group mar-l-20">
                                             <label for="property-geo">Property geo (m2) :</label>
-                                            <input type="text" class="span2" value="" data-slider-min="0" 
-                                                   data-slider-max="600" data-slider-step="5" 
-                                                   data-slider-value="[50,450]" id="property-geo" ><br />
+                                            <input type="text" class="span2" value="" data-slider-min="40" 
+                                                   data-slider-max="400" data-slider-step="5" 
+                                                   data-slider-value="[40,400]" id="property-geo" name="property_geo"><br />
                                             <b class="pull-left color">40m</b> 
-                                            <b class="pull-right color">12000m</b>
+                                            <b class="pull-right color">400m</b>
                                         </div>
                                         <!-- End of  --> 
                                     </div>
@@ -78,119 +88,58 @@ get_header();
                                     <div class="search-row">
 
                                         <div class="form-group mar-r-20">
-                                            <label for="price-range">Min baths :</label>
-                                            <input type="text" class="span2" value="" data-slider-min="0" 
-                                                   data-slider-max="600" data-slider-step="5" 
-                                                   data-slider-value="[250,450]" id="min-baths" ><br />
+                                            <label for="price-range">Baths :</label>
+                                            <input type="text" class="span2" value="" data-slider-min="1" 
+                                                   data-slider-max="50" data-slider-step="1" 
+                                                   data-slider-value="[1,50]" id="min-baths" name="min_baths"><br />
                                             <b class="pull-left color">1</b> 
-                                            <b class="pull-right color">120</b>
+                                            <b class="pull-right color">50</b>
                                         </div>
                                         <!-- End of  --> 
 
                                         <div class="form-group mar-l-20">
-                                            <label for="property-geo">Min bed :</label>
-                                            <input type="text" class="span2" value="" data-slider-min="0" 
-                                                   data-slider-max="600" data-slider-step="5" 
-                                                   data-slider-value="[250,450]" id="min-bed" ><br />
+                                            <label for="property-geo">Bed :</label>
+                                            <input type="text" class="span2" value="" data-slider-min="1" 
+                                                   data-slider-max="50" data-slider-step="1" 
+                                                   data-slider-value="[1,50]" id="min-bed" name="min_bed"><br />
                                             <b class="pull-left color">1</b> 
-                                            <b class="pull-right color">120</b>
+                                            <b class="pull-right color">50</b>
                                         </div>
                                         <!-- End of  --> 
 
                                     </div>
                                     <br>
+                                    <?php
+                                    $taxonomy_name = 'features';
+                                    $terms = get_terms($taxonomy_name);
+                                    ?>                                    
                                     <div class="search-row">  
-
+                                              
                                         <div class="form-group">
                                             <div class="checkbox">
-                                                <label>
-                                                    <input type="checkbox"> Fire Place(3100)
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <!-- End of  -->  
-
-                                        <div class="form-group">
-                                            <div class="checkbox">
-                                                <label>
-                                                    <input type="checkbox"> Dual Sinks(500)
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <!-- End of  --> 
-
-                                        <div class="form-group">
-                                            <div class="checkbox">
-                                                <label>
-                                                    <input type="checkbox"> Hurricane Shutters(99)
-                                                </label>
+                                            <?php
+                                                $counter = 0;
+                                                foreach ($terms as $term) {
+                                                    if ($counter == 1 || $counter == 2) {
+                                                        echo '</div></div><div class="form-group"><div class="checkbox">';
+                                                    }else if ($counter == 3) {
+                                                        echo '</div></div></div><div class="search-row"><div class="form-group"><div class="checkbox">';
+                                                        $counter = 0;
+                                                    }
+                                                    ?>
+                                                    <label>
+                                                        <input type="checkbox" name="categories[]" value="<?php echo $term->slug; ?>" >
+                                                        <?php echo $term->name; ?>
+                                                    </label>
+                                                    <?php
+                                                    $counter++;
+                                            }
+                                                ?>
                                             </div>
                                         </div>
                                         <!-- End of  --> 
                                     </div>
-
-                                    <div class="search-row">  
-
-                                        <div class="form-group">
-                                            <div class="checkbox">
-                                                <label>
-                                                    <input type="checkbox"> Swimming Pool(1190)
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <!-- End of  -->  
-
-                                        <div class="form-group">
-                                            <div class="checkbox">
-                                                <label>
-                                                    <input type="checkbox"> 2 Stories(4600)
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <!-- End of  --> 
-
-                                        <div class="form-group">
-                                            <div class="checkbox">
-                                                <label>
-                                                    <input type="checkbox"> Emergency Exit(200)
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <!-- End of  --> 
-                                    </div>                                    
-
-                                    <div class="search-row">  
-
-                                        <div class="form-group">
-                                            <div class="checkbox">
-                                                <label>
-                                                    <input type="checkbox"> Laundry Room(10073)
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <!-- End of  -->  
-
-                                        <div class="form-group">
-                                            <div class="checkbox">
-                                                <label>
-                                                    <input type="checkbox"> Jog Path(1503)
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <!-- End of  --> 
-
-                                        <div class="form-group">
-                                            <div class="checkbox">
-                                                <label>
-                                                    <input type="checkbox"> 26' Ceilings(1200)
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <!-- End of  --> 
-                                        <br>
-                                        <hr>
-                                    </div>                             
-                                    <button class="btn search-btn prop-btm-sheaerch" type="submit"><i class="fa fa-search"></i></button>  
+                                    <button class="btn search-btn prop-btm-sheaerch" value="Search" type="submit"><i class="fa fa-search"></i></button>  
                                 </div>                    
 
                             </form>
@@ -213,124 +162,73 @@ get_header();
 
                 <div class="row">
                     <div class="proerty-th">
-                        <div class="col-sm-6 col-md-3 p0">
-                            <div class="box-two proerty-item">
-                                <div class="item-thumb">
-                                    <a href="property-1.html" ><img src="<?php echo get_template_directory_uri()?>/assets/img/demo/property-1.jpg"></a>
-                                </div>
-                                <div class="item-entry overflow">
-                                    <h5><a href="property-1.html" >Super nice villa </a></h5>
-                                    <div class="dot-hr"></div>
-                                    <span class="pull-left"><b>Area :</b> 120m </span>
-                                    <span class="proerty-price pull-right">$ 300,000</span>
-                                </div>
-                            </div>
-                        </div>
+                        
+                    <?php 
+                    $args = array(
+                        'post_type' => 'property', 
+                        'posts_per_page' => -1, 
+                    );
+                
+                    $query = new WP_Query($args);
+                    
+                    if ( $query->have_posts() ) : 
+                                    while ( $query->have_posts() ) :
+                                        $query->the_post();
+                                        $area = get_post_meta(get_the_ID(),'area',true);
+                                        $price = get_post_meta(get_the_ID(),'price',true);
+                                        $bed_room = get_post_meta(get_the_ID(),'bed_room',true);
+                                        $bath_room = get_post_meta(get_the_ID(),'bath_room',true);
+                                        $garage = get_post_meta(get_the_ID(),'garage',true);
 
-                        <div class="col-sm-6 col-md-3 p0">
-                            <div class="box-two proerty-item">
-                                <div class="item-thumb">
-                                    <a href="property-2.html" ><img src="<?php echo get_template_directory_uri()?>/assets/img/demo/property-2.jpg"></a>
-                                </div>
-                                <div class="item-entry overflow">
-                                    <h5><a href="property-2.html" >Super nice villa </a></h5>
-                                    <div class="dot-hr"></div>
-                                    <span class="pull-left"><b>Area :</b> 120m </span>
-                                    <span class="proerty-price pull-right">$ 300,000</span>
-                                </div>
-                            </div>
-                        </div>
+                                        $area = $area == '0' || '' ? 'Уточнить ' : $area;
+                                        $price = $price == '0' || '' ? 'Уточнить ' : $price;
+                                        $bed_room = $bed_room == '0' || '' ? 'Уточнить ' : $bed_room;
+                                        $bath_room = $bath_room == '0' || '' ? 'Уточнить ' : $bath_room;
+                                        $garage = $garage == '0' || '' ? 'Уточнить ' : $garage;
 
-                        <div class="col-sm-6 col-md-3 p0">
-                            <div class="box-two proerty-item">
-                                <div class="item-thumb">
-                                    <a href="property-3.html" ><img src="<?php echo get_template_directory_uri()?>/assets/img/demo/property-3.jpg"></a>
-
-                                </div>
-                                <div class="item-entry overflow">
-                                    <h5><a href="property-3.html" >Super nice villa </a></h5>
-                                    <div class="dot-hr"></div>
-                                    <span class="pull-left"><b>Area :</b> 120m </span>
-                                    <span class="proerty-price pull-right">$ 300,000</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-sm-6 col-md-3 p0">
-                            <div class="box-two proerty-item">
-                                <div class="item-thumb">
-                                    <a href="property-1.html" ><img src="<?php echo get_template_directory_uri()?>/assets/img/demo/property-4.jpg"></a>
-
-                                </div>
-                                <div class="item-entry overflow">
-                                    <h5><a href="property-1.html" >Super nice villa </a></h5>
-                                    <div class="dot-hr"></div>
-                                    <span class="pull-left"><b>Area :</b> 120m </span>
-                                    <span class="proerty-price pull-right">$ 300,000</span>
-                                </div>
-                            </div>
-                        </div>
+                                        ?>
+                                            <div class="col-sm-6 col-md-4 p0">
+                                                <div class="box-two proerty-item">
+                                                    <div class="item-thumb">
+                                                        <a href="<?php echo get_post_permalink()?>" ><img src="<?php echo get_the_post_thumbnail_url()?>"></a>
+                                                    </div>
+                                                    <div class="item-entry overflow">
+                                            <h5><a href="<?php echo get_post_permalink()?>"> <?php echo get_the_title() ?> </a></h5>
+                                            <div class="dot-hr"></div>
+                                            <span class="pull-left"><b> Area :</b> <?php echo $area ?>m </span>
+                                            <span class="proerty-price pull-right"> $ <?php echo $price ?></span>
+                                            <p style="display: none;"><?php echo get_the_content()?></p>
+                                            <div class="property-icon">
+                                                <img src="<?php echo get_template_directory_uri()?>/assets/img/icon/bed.png"> (<?php echo $bed_room ?>)|
+                                                <img src="<?php echo get_template_directory_uri()?>/assets/img/icon/shawer.png"> (<?php echo $bath_room ?>)|
+                                                <img src="<?php echo get_template_directory_uri()?>/assets/img/icon/cars.png"> (<?php echo $garage ?>)  
+                                            </div>
+                                        </div>
 
 
-                        <div class="col-sm-6 col-md-3 p0">
-                            <div class="box-two proerty-item">
-                                <div class="item-thumb">
-                                    <a href="property-3.html" ><img src="<?php echo get_template_directory_uri()?>/assets/img/demo/property-2.jpg"></a>
-                                </div>
-                                <div class="item-entry overflow">
-                                    <h5><a href="property-3.html" >Super nice villa </a></h5>
-                                    <div class="dot-hr"></div>
-                                    <span class="pull-left"><b>Area :</b> 120m </span>
-                                    <span class="proerty-price pull-right">$ 300,000</span>
-                                </div>
-                            </div>
-                        </div>
+                                    </div>
+                                </div> 
+                                        <?php
+                                    
 
-                        <div class="col-sm-6 col-md-3 p0">
-                            <div class="box-two proerty-item">
-                                <div class="item-thumb">
-                                    <a href="property-2.html" ><img src="<?php echo get_template_directory_uri()?>/assets/img/demo/property-4.jpg"></a>
-                                </div>
-                                <div class="item-entry overflow">
-                                    <h5><a href="property-2.html" >Super nice villa </a></h5>
-                                    <div class="dot-hr"></div>
-                                    <span class="pull-left"><b>Area :</b> 120m </span>
-                                    <span class="proerty-price pull-right">$ 300,000</span>
-                                </div>
-                            </div>
-                        </div>
+                                    endwhile;
 
-                        <div class="col-sm-6 col-md-3 p0">
-                            <div class="box-two proerty-item">
-                                <div class="item-thumb">
-                                    <a href="property-1.html" ><img src="<?php echo get_template_directory_uri()?>/assets/img/demo/property-3.jpg"></a>
-                                </div>
-                                <div class="item-entry overflow">
-                                    <h5><a href="property-1.html" >Super nice villa </a></h5>
-                                    <div class="dot-hr"></div>
-                                    <span class="pull-left"><b>Area :</b> 120m </span>
-                                    <span class="proerty-price pull-right">$ 300,000</span>
-                                </div>
-                            </div>
-                        </div>
+                                    wp_reset_postdata(); 
 
-                        <div class="col-sm-6 col-md-3 p0">
-                            <div class="box-tree more-proerty text-center">
-                                <div class="item-tree-icon">
-                                    <i class="fa fa-th"></i>
-                                </div>
-                                <div class="more-entry overflow">
-                                    <h5><a href="property-1.html" >CAN'T DECIDE ? </a></h5>
-                                    <h5 class="tree-sub-ttl">Show all properties</h5>
-                                    <button class="btn border-btn more-black" value="All properties">All properties</button>
-                                </div>
-                            </div>
-                        </div>
+                                    the_posts_navigation();
+                                ?>
 
                     </div>
                 </div>
             </div>
         </div>
+        <?php 
+                else :
+
+                    get_template_part( 'template-parts/content', 'none' );
+
+                endif;
+                ?>
 
         <!--Welcome area -->
         <div class="Welcome-area">

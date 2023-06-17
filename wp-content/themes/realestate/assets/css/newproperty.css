@@ -1,0 +1,13 @@
+#new_post{
+    border: 5px solid gold;
+    border-radius: 60px;
+    width: 500px;
+    padding: 30px;
+    margin: 50px auto;
+}
+#new_post input{
+    border: 1px solid black;
+}
+#new_post textarea{
+    width: 100%;
+}

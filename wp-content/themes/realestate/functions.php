@@ -32,6 +32,7 @@ function realestate_enqueue_scripts() {
 	wp_enqueue_script( 'realestate-icheck', get_template_directory_uri() . '/assets/js/icheck.min.js' );
 	wp_enqueue_script( 'realestate-price-range', get_template_directory_uri() . '/assets/js/price-range.js' );
 	wp_enqueue_script( 'realestate-main', get_template_directory_uri() . '/assets/js/main.js' );
+	wp_enqueue_script( 'realestate-icon', 'https://kit.fontawesome.com/e76443ab3a.js');
 }
 
 function realestate_enqueue_styles() {
@@ -51,6 +52,8 @@ function realestate_enqueue_styles() {
 	wp_enqueue_style( 'realestate-owl-transitions', get_template_directory_uri() . '/assets/css/owl.transitions.css' );
 	wp_enqueue_style( 'realestate-style', get_template_directory_uri() . '/assets/css/style.css' );
 	wp_enqueue_style( 'realestate-responsive', get_template_directory_uri() . '/assets/css/responsive.css' );
+	wp_enqueue_style( 'realestate-newproperty', get_template_directory_uri() . '/assets/css/newproperty.css' );
+	wp_enqueue_style( 'realestate-login', get_template_directory_uri() . '/assets/css/login.css' );
 }
 
 add_action( 'wp_enqueue_scripts', 'realestate_enqueue_scripts');
@@ -140,6 +143,115 @@ function realestate_register_post_type_property() {
 }
 
 add_action( 'init', 'realestate_register_post_type_property' );
+
+function hide_admin_bar_for_members() {
+    if (current_user_can('subscriber')) {
+        show_admin_bar(false);
+    }
+}
+add_action('after_setup_theme', 'hide_admin_bar_for_members');
+
+
+function realestate_create_post_handler() {
+	$post_title = $_POST['post_title'];
+	$post_content = $_POST['post_content'];
+	$custom_field_status = $_POST['custom_field_status'];
+	$custom_field_price = $_POST['custom_field_price'];
+	$custom_field_area = $_POST['custom_field_area'];
+	$custom_field_bed_room = $_POST['custom_field_bed_room'];
+	$custom_field_bath_room = $_POST['custom_field_bath_room'];
+	$custom_field_garage = $_POST['custom_field_garage'];
+	$custom_field_waterfront = $_POST['custom_field_waterfront'];
+	$custom_field_built_in = $_POST['custom_field_built_in'];
+	$custom_field_parking = $_POST['custom_field_parking'];
+	$custom_field_view = $_POST['custom_field_view'];
+
+	$taxonomy1_terms = $_POST['cities'];
+	$categories_terms = isset( $_POST['categories'] ) ? $_POST['categories'] : array();
+
+	$new_post = array(
+	  'post_title'   => $post_title,
+	  'post_content' => $post_content,
+	  'post_status'  => 'publish',
+	  'post_author'  => get_current_user_id(),
+	  'post_type'    => 'property' 
+	);
+  
+	$post_id = wp_insert_post( $new_post );
+  
+	if ( $post_id ) {
+		update_post_meta( $post_id, 'status', $custom_field_status );
+		update_post_meta( $post_id, 'price', $custom_field_price );
+		update_post_meta( $post_id, 'area', $custom_field_area );
+		update_post_meta( $post_id, 'bed_room', $custom_field_bed_room );
+		update_post_meta( $post_id, 'bath_room', $custom_field_bath_room );
+		update_post_meta( $post_id, 'garage', $custom_field_garage );
+		update_post_meta( $post_id, 'waterfront', $custom_field_waterfront );
+		update_post_meta( $post_id, 'built_in', $custom_field_built_in );
+		update_post_meta( $post_id, 'parking', $custom_field_parking );
+		update_post_meta( $post_id, 'view', $custom_field_view );
+		
+		wp_set_object_terms( $post_id, intval( $taxonomy1_terms ), 'cities' );
+		wp_set_post_terms( $post_id, $categories_terms, 'features' );
+
+		if ( ! empty( $_FILES['post_image'] ) ) {
+			$image_file = $_FILES['post_image'];
+			$upload_overrides = array( 'test_form' => false );
+			$attachment_id = media_handle_upload( 'post_image', $post_id, $upload_overrides );
+	  
+			if ( is_wp_error( $attachment_id ) ) {
+			  echo 'Произошла ошибка при загрузке изображения.';
+			} else {
+			  set_post_thumbnail( $post_id, $attachment_id );
+			}
+		  }
+
+    if ( ! empty( $_FILES['image1'] ) ) {
+		$image1_file = $_FILES['image1'];
+		$image1_attachment_id = media_handle_upload( 'image1', $post_id );
+		if ( ! is_wp_error( $image1_attachment_id ) ) {
+		  update_post_meta( $post_id, 'image1', $image1_attachment_id );
+		}
+	  }
+  
+	  if ( ! empty( $_FILES['image2'] ) ) {
+		$image2_file = $_FILES['image2'];
+		$image2_attachment_id = media_handle_upload( 'image2', $post_id );
+		if ( ! is_wp_error( $image2_attachment_id ) ) {
+		  update_post_meta( $post_id, 'image2', $image2_attachment_id );
+		}
+	  }
+  
+	  if ( ! empty( $_FILES['image3'] ) ) {
+		$image3_file = $_FILES['image3'];
+		$image3_attachment_id = media_handle_upload( 'image3', $post_id );
+		if ( ! is_wp_error( $image3_attachment_id ) ) {
+		  update_post_meta( $post_id, 'image3', $image3_attachment_id );
+		}
+	  }		
+
+	  wp_redirect( get_permalink( $post_id ) );
+	  exit;
+	} else {
+	  echo 'Произошла ошибка при создании поста.';
+	}
+  }
+  add_action( 'admin_post_nopriv_create_post', 'realestate_create_post_handler' );
+  add_action( 'admin_post_create_post', 'realestate_create_post_handler' );
+
+
+  
+
+function realestate_create_post_shortcode() {
+    if (is_user_logged_in()) {
+        $button = '<a href="/new-property"><button class="navbar-btn nav-button wow bounceInRight login" data-wow-delay="0.45s">Submit your property</button></a><a href="/logout"><button class="navbar-btn nav-button wow bounceInRight login" data-wow-delay="0.45s">Logout</button></a>';
+    } else {
+        $button = '<a href="/login"><button class="navbar-btn nav-button wow bounceInRight login" data-wow-delay="0.45s">Login</button></a>';
+    }
+
+    return $button;
+}
+add_shortcode('create_post', 'realestate_create_post_shortcode');
 
 
 function realestate_setup() {

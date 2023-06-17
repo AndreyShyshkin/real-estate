@@ -21,7 +21,7 @@
 	<?php wp_head(); ?>
 </head>
 
-<body <?php body_class(); ?>>
+<body <?php body_class();?>>
 <?php wp_body_open(); ?>
 <div id="preloader">
             <div id="status">&nbsp;</div>
@@ -45,8 +45,9 @@
                 <!-- Collect the nav links, forms, and other content for toggling -->
                 <div class="collapse navbar-collapse yamm" id="navigation">
                 <div class="button navbar-right">
-                        <button class="navbar-btn nav-button wow bounceInRight login" onclick=" window.open('register.html')" data-wow-delay="0.45s">Login</button>
-                        <button class="navbar-btn nav-button wow fadeInRight" onclick=" window.open('submit-property.html')" data-wow-delay="0.48s">Submit</button>
+                <?php
+                echo do_shortcode('[create_post]');
+                ?>
                 </div>
 <?php 
 	wp_nav_menu(array(
@@ -61,4 +62,5 @@
                 </div><!-- /.navbar-collapse -->
             </div><!-- /.container-fluid -->
         </nav>
+
         <!-- End of nav bar -->
